@@ -94,16 +94,22 @@ try {
         $fromName = 'Velasco Chemicals';
     }
     if ($toAddress === false || trim($toAddress) === '') {
-        $toAddress = 'velascochemicals@gmail.com';
+        $toAddress = 'velascochemicals@gmail.com,yavish50501@gmail.com';
     }
+    $toAddresses = array_map('trim', explode(',', $toAddress));
     if ($port === false || trim($port) === '') {
         $port = '587';
     }
     if ($encryption === '') {
         $encryption = 'tls';
     }
-    if (!filter_var($fromAddress, FILTER_VALIDATE_EMAIL) || !filter_var($toAddress, FILTER_VALIDATE_EMAIL)) {
-        throw new RuntimeException('MAIL_FROM_ADDRESS and MAIL_TO_ADDRESS must be valid email addresses.');
+    if (!filter_var($fromAddress, FILTER_VALIDATE_EMAIL)) {
+        throw new RuntimeException('MAIL_FROM_ADDRESS must be a valid email address.');
+    }
+    foreach ($toAddresses as $address) {
+        if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
+            throw new RuntimeException('MAIL_TO_ADDRESS must contain valid comma-separated email addresses.');
+        }
     }
     if (!ctype_digit((string) $port) || (int) $port < 1 || (int) $port > 65535) {
         throw new RuntimeException('MAIL_SMTP_PORT must be a valid TCP port.');
@@ -124,7 +130,9 @@ try {
     $mail->Port = (int) $port;
     $mail->CharSet = PHPMailer\PHPMailer\PHPMailer::CHARSET_UTF8;
     $mail->setFrom($fromAddress, $fromName);
-    $mail->addAddress(trim($toAddress));
+    foreach ($toAddresses as $address) {
+        $mail->addAddress($address);
+    }
     $mail->addReplyTo($email, $name);
     $mail->Subject = 'Website enquiry - Velasco Chemicals';
     $mail->isHTML(false);
