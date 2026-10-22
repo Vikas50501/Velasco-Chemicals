@@ -9,16 +9,6 @@ function respond($status, $data)
     exit;
 }
 
-function requiredEnvironmentValue($name)
-{
-    $value = getenv($name);
-    if ($value === false || trim($value) === '') {
-        throw new RuntimeException('Missing required environment variable: ' . $name);
-    }
-
-    return $value;
-}
-
 function textLength($value)
 {
     return preg_match_all('/./us', $value);
@@ -70,39 +60,17 @@ if (
 try {
     require __DIR__ . '/vendor/autoload.php';
 
-    $host = getenv('MAIL_SMTP_HOST');
-    if ($host === false || trim($host) === '') {
-        $host = 'smtp.gmail.com';
-    }
-    $username = getenv('MAIL_SMTP_USERNAME');
-    if ($username === false || trim($username) === '') {
-        $username = 'yavish50501@gmail.com';
-    }
-    $username = trim($username);
-    $password = requiredEnvironmentValue('MAIL_SMTP_PASSWORD');
-    $fromAddress = getenv('MAIL_FROM_ADDRESS');
-    if ($fromAddress === false || trim($fromAddress) === '') {
-        $fromAddress = 'yavish50501@gmail.com';
-    }
-    $fromAddress = trim($fromAddress);
-    $fromName = getenv('MAIL_FROM_NAME');
-    $toAddress = getenv('MAIL_TO_ADDRESS');
-    $port = getenv('MAIL_SMTP_PORT');
-    $encryption = strtolower((string) getenv('MAIL_SMTP_ENCRYPTION'));
+    // SMTP credentials (set directly here instead of via environment variables).
+    $host = 'smtp.gmail.com';
+    $username = 'yavish50501@gmail.com';
+    $password = 'PASTE_YOUR_NEW_GMAIL_APP_PASSWORD_HERE';
+    $fromAddress = 'yavish50501@gmail.com';
+    $fromName = 'Velasco Chemicals';
+    $toAddress = 'velascochemicals@gmail.com,yavish50501@gmail.com';
+    $port = '587';
+    $encryption = 'tls';
 
-    if ($fromName === false || trim($fromName) === '') {
-        $fromName = 'Velasco Chemicals';
-    }
-    if ($toAddress === false || trim($toAddress) === '') {
-        $toAddress = 'velascochemicals@gmail.com,yavish50501@gmail.com';
-    }
     $toAddresses = array_map('trim', explode(',', $toAddress));
-    if ($port === false || trim($port) === '') {
-        $port = '587';
-    }
-    if ($encryption === '') {
-        $encryption = 'tls';
-    }
     if (!filter_var($fromAddress, FILTER_VALIDATE_EMAIL)) {
         throw new RuntimeException('MAIL_FROM_ADDRESS must be a valid email address.');
     }
